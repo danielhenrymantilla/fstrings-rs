@@ -4,7 +4,12 @@ version = "0.0.1"
 authors = ["Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Python3 fstrings with Rust formatting"
+license = "MIT"
+
+documentation = "https://docs.rs/fstrings"
+repository = "https://github.com/danielhenrymantilla/fstrings-rs"
+homepage = "https://crates.io/crates/fstrings"
 
 [dependencies]
 proc-macro = { version = "0.0.1", package = "fstrings-proc-macro", path = "src/proc_macro" }
