@@ -1,0 +1,22 @@
+[lib]
+proc-macro = true
+path = "mod.rs"
+
+[package]
+name = "fstrings-proc-macro"
+version = "0.0.1"
+authors = ["Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>"]
+edition = "2018"
+
+description = "Python3 fstrings with Rust formatting"
+license = "MIT"
+
+[dependencies]
+proc-macro2 = "0.4.30"
+# proc-macro-crate = "0.1.4"
+# proc-macro-hack = "0.5.8"
+proc-quote = "0.2.2"
+syn = "0.15.42"
+
+[features]
+verbose-expansions = ["syn/extra-traits", ]
