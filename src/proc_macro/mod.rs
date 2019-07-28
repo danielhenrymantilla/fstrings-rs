@@ -1,16 +1,10 @@
-#![cfg_attr(debug_assertions,
-    allow(unused_imports)
-)]
-
 extern crate proc_macro; use ::proc_macro::TokenStream;
 use ::core::ops::Not;
 use ::proc_quote::{
     quote,
-    quote_spanned,
     ToTokens,
 };
 use proc_macro2::{
-    Span,
     TokenStream as TokenStream2,
 };
 use ::syn::{*,
