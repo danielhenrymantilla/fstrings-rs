@@ -13,7 +13,6 @@ license = "MIT"
 
 [dependencies]
 proc-macro2 = "0.4.30"
-# proc-macro-crate = "0.1.4"
 proc-macro-hack = "0.5.8"
 proc-quote = "0.2.2"
 syn = "0.15.42"

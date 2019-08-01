@@ -13,6 +13,21 @@
 
 #![no_std]
 
+mod doctest_readme {
+    macro_rules! with_doc {(
+        #[doc = $doc_string:expr]
+        $item:item
+    ) => (
+        #[doc = $doc_string]
+        $item
+    )}
+
+    with_doc! {
+        #[doc = include_str!("../README.md")]
+        extern {}
+    }
+}
+
 macro_rules! mk_macros {( @with_dollar![$dol:tt]=>
     $(
         #[doc = $doc_string:literal]
@@ -57,6 +72,18 @@ mk_macros! { @with_dollar![$]=>
     f
         => format!(...)
     ,
+    #[doc = "Like [`panic!`](https://doc.rust-lang.org/std/macro.panic.html), but with basic f-string interpolation."]
+    panic_f
+        => panic!(...)
+    ,
+    #[doc = "Like [`unreachable!`](https://doc.rust-lang.org/std/macro.unreachable.html), but with basic f-string interpolation."]
+    unreachable_f
+        => unreachable!(...)
+    ,
+    #[doc = "Like [`unimplemented!`](https://doc.rust-lang.org/std/macro.unimplemented.html), but with basic f-string interpolation."]
+    unimplemented_f
+        => unimplemented!(...)
+    ,
     #[doc = "Like [`write!`](https://doc.rust-lang.org/std/macro.write.html), but with basic f-string interpolation."]
     write_f
         => write!(stream, ...)
@@ -67,6 +94,8 @@ mk_macros! { @with_dollar![$]=>
     ,
 }
 
-/// Like [`format_args!`](https://doc.rust-lang.org/std/macro.format_args.html), but with basic f-string interpolation.
+/// Like [`format_args!`](
+/// https://doc.rust-lang.org/std/macro.format_args.html),
+/// but with basic f-string interpolation.
 #[::proc_macro_hack::proc_macro_hack(fake_call_site)]
 pub use proc_macro::format_args_f;

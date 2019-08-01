@@ -1,10 +1,9 @@
 extern crate proc_macro; use ::proc_macro::TokenStream;
-use ::core::ops::Not;
 use ::proc_quote::{
     quote,
     ToTokens,
 };
-use proc_macro2::{
+use ::proc_macro2::{
     TokenStream as TokenStream2,
 };
 use ::syn::{*,
@@ -14,47 +13,44 @@ use ::syn::{*,
     },
     punctuated::Punctuated,
 };
+use ::std::ops::Not;
 
 #[macro_use]
 mod macros;
 
-enum FmtArg {
-    Expr(Expr),
-
-    IdentEqExpr {
-        ident: Ident,
-        expr: Expr,
-    },
+struct FmtArg {
+    ident: Option<Ident>,
+    expr: Expr,
 }
 
 impl Parse for FmtArg {
     fn parse (input: ParseStream) -> Result<Self>
     {
-        if input.peek(Ident) {
-            let ident = input.parse().unwrap();
-            let _: Token![=] = input.parse()?;
-            let expr = input.parse()?;
-            Ok(FmtArg::IdentEqExpr { ident, expr })
-        } else {
-            Ok(FmtArg::Expr(input.parse()?))
-        }
+        Ok(FmtArg {
+            ident: {
+                if  input.peek(Ident) &&
+                    input.peek2(Token![=]) &&
+                    input.peek3(Token![=]).not()
+                {
+                    let ident: Ident = input.parse().unwrap();
+                    let _: Token![=] = input.parse().unwrap();
+                    Some(ident)
+                } else {
+                    None
+                }
+            },
+            expr: input.parse()?,
+        })
     }
 }
 
 impl ToTokens for FmtArg {
     fn to_tokens (self: &'_ Self, out: &'_ mut TokenStream2)
     {
-        out.extend(match self {//
-            | &FmtArg::Expr(ref expr) => quote! {
-                #expr
-            },
-            | &FmtArg::IdentEqExpr {
-                ref ident,
-                ref expr,
-            } => quote! {
-                #ident = #expr
-            },
-        });
+        if let Some(ref ident) = self.ident {
+            out.extend(quote! { #ident = });
+        }
+        self.expr.to_tokens(out);
     }
 }
 
@@ -68,13 +64,15 @@ impl Parse for Args {
     fn parse (input: ParseStream) -> Result<Self>
     {
         let format_literal = input.parse()?;
-        let extra_args = if input.parse::<Option<Token![,]>>()?.is_some() {
-            Punctuated::<FmtArg, Token![,]>::parse_terminated(input)?
-                .into_iter()
-                .collect()
-        } else {
-            Vec::new()
-        };
+        let extra_args =
+            if input.parse::<Option<Token![,]>>()?.is_some() {
+                Punctuated::<FmtArg, Token![,]>::parse_terminated(input)?
+                    .into_iter()
+                    .collect()
+            } else {
+                Vec::new()
+            }
+        ;
         Ok(Self {
             format_literal,
             extra_args,
@@ -117,24 +115,18 @@ fn format_args_f (input: TokenStream) -> TokenStream
                 ))
         ;
         let arg = s[.. end].trim();
-        let cur_ident = match parse_str::<Ident>(arg) {//
+        let ident = match parse_str::<Ident>(arg) {
             | Ok(ident) => ident,
             | Err(_) => continue,
         };
-        if extra_args
+        // if `ident = ...` is not yet among the extra args
+        if  extra_args
                 .iter()
-                .any(|arg| {
-                    if let &FmtArg::IdentEqExpr { ref ident, .. } = arg {
-                        *ident == cur_ident
-                    } else {
-                        false
-                    }
-                })
-                .not()
+                .all(|arg| Some(&ident) != arg.ident.as_ref())
         {
-            extra_args.push(FmtArg::IdentEqExpr {
-                expr: parse_quote!(#cur_ident),
-                ident: cur_ident,
+            extra_args.push(FmtArg {
+                expr: parse_quote!(#ident),
+                ident: Some(ident),
             });
         }
     }
