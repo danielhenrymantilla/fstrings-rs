@@ -85,23 +85,30 @@ fn format_args_f (input: TokenStream) -> TokenStream
 {
     #[allow(unused)]
     const FUNCTION_NAME: &str = "format_args_f";
+    let mut expr_cnt = 0;
 
     debug_input!(&input);
-
     let Args {
-        format_literal,
+        mut format_literal,
         mut extra_args,
     } = parse_macro_input!(input);
     let s = format_literal.value();
 
+    // this might be easier to maintain if we were to tokenize the
+    // string and handle tokens rather than characters.
     let mut iterator = s.char_indices().peekable();
+    
+    let mut frmt = String::new();
+    frmt.push('"');
     while let Some((i, c)) = iterator.next() {
         if c != '{' {
+            frmt.push(c);
             continue;
         }
         // encountered `{`, let's see if it was `{{`
         if let Some(&(_, '{')) = iterator.peek() {
             let _ = iterator.next();
+            frmt.push('{');
             continue;
         }
         let s = &s[i + 1 ..];
@@ -115,22 +122,60 @@ fn format_args_f (input: TokenStream) -> TokenStream
                 ))
         ;
         let arg = s[.. end].trim();
-        let ident = match parse_str::<Ident>(arg) {
-            | Ok(ident) => ident,
-            | Err(_) => continue,
-        };
-        // if `ident = ...` is not yet among the extra args
-        if  extra_args
-                .iter()
-                .all(|arg| Some(&ident) != arg.ident.as_ref())
+        match arg.find(|c: char| (!c.is_alphanumeric()) && (c != '_'))
         {
-            extra_args.push(FmtArg {
-                expr: parse_quote!(#ident),
-                ident: Some(ident),
-            });
+            None =>
+            {
+                let ident = match parse_str::<Ident>(arg) {
+                    | Ok(ident) => ident,
+                    | Err(_) => continue,
+                };
+                // if `ident = ...` is not yet among the extra args
+                if  extra_args
+                    .iter()
+                    .all(|arg| Some(&ident) != arg.ident.as_ref())
+                {
+                    extra_args.push(FmtArg {
+                        expr: parse_quote!(#ident),
+                        ident: Some(ident),
+                    });
+                }
+                let end = s.find('}')
+                    .expect(
+                        "missing close delimiter `}` in format." );
+                frmt.push('{');
+                frmt.push_str(&s[..end]);
+                for _ in 0..end {
+                    iterator.next();
+                }
+            },
+            _ =>
+            {
+                let exp = match parse_str::<Expr>(arg) {
+                    | Ok(expr) => expr,
+                    | Err(_) => continue,
+                };
+                let id = format!("expr_{}___", expr_cnt);
+                expr_cnt += 1;
+                extra_args.push(FmtArg {
+                    expr: parse_quote!(#exp),
+                    ident: Some(parse_str::<Ident>(&id).unwrap())
+                });
+                frmt.push('{');
+                frmt.push_str(id.as_str());
+                frmt.push('}');
+                let end = s.find('}')
+                    .expect(
+                        "missing close delimiter `}` in format." );
+                for _ in 0..end+1 {
+                    iterator.next();
+                }
+            }
         }
     }
-
+    frmt.push('"');
+    format_literal = parse_str::<LitStr>(frmt.as_str()).unwrap();
+ 
     TokenStream::from(debug_output!(quote! {
         format_args!(#format_literal #(, #extra_args)*)
     }))
