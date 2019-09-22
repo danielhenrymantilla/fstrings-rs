@@ -186,7 +186,8 @@ fn format_args_f (input: TokenStream) -> TokenStream
         }
     }
     frmt.push('"');
- 
+    format_literal = parse_str::<LitStr>(frmt.as_str()).unwrap();
+
     TokenStream::from(debug_output!(quote! {
         format_args!(#format_literal #(, #extra_args)*)
     }))
