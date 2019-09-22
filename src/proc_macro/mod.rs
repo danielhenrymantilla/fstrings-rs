@@ -121,7 +121,8 @@ fn format_args_f (input: TokenStream) -> TokenStream
                     "you can escape it using `{{`",
                 ))
         ;
-        let arg = s[.. end].trim();
+        let mut arg = s[.. end].trim();
+
         match arg.find(|c: char| (!c.is_alphanumeric()) && (c != '_'))
         {
             None =>
@@ -140,9 +141,8 @@ fn format_args_f (input: TokenStream) -> TokenStream
                         ident: Some(ident),
                     });
                 }
-                let end = s.find('}')
-                    .expect(
-                        "missing close delimiter `}` in format." );
+                let end = s.find('}').expect(
+                    "missing close delimiter `}` in format." );
                 frmt.push('{');
                 frmt.push_str(&s[..end]);
                 for _ in 0..end {
@@ -151,6 +151,10 @@ fn format_args_f (input: TokenStream) -> TokenStream
             },
             _ =>
             {
+                let trailing_eq = arg.ends_with('=');
+                if trailing_eq {
+                    arg = &arg[.. arg.len() - 1];
+                }
                 let exp = match parse_str::<Expr>(arg) {
                     | Ok(expr) => expr,
                     | Err(_) => continue,
@@ -161,8 +165,16 @@ fn format_args_f (input: TokenStream) -> TokenStream
                     expr: parse_quote!(#exp),
                     ident: Some(parse_str::<Ident>(&id).unwrap())
                 });
+                if trailing_eq {
+                    frmt.push_str(&s[..end-1]);
+                    frmt.push('=');
+                }
                 frmt.push('{');
                 frmt.push_str(id.as_str());
+                if s[end..].starts_with(':') {
+                    frmt.push_str(&s[end..(s.find('}')
+                                     .expect("missing `}`."))]);
+                }
                 frmt.push('}');
                 let end = s.find('}')
                     .expect(
@@ -174,7 +186,6 @@ fn format_args_f (input: TokenStream) -> TokenStream
         }
     }
     frmt.push('"');
-    format_literal = parse_str::<LitStr>(frmt.as_str()).unwrap();
  
     TokenStream::from(debug_output!(quote! {
         format_args!(#format_literal #(, #extra_args)*)
