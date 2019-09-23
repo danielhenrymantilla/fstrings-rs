@@ -94,11 +94,7 @@ fn format_args_f (input: TokenStream) -> TokenStream
         mut extra_args,
     } = parse_macro_input!(input);
     let s = format_literal.value();
-
-    // this might be easier to maintain if we were to tokenize the
-    // string and handle tokens rather than characters.
     let mut iterator = s.chars().peekable();
-    
     let mut curly_bracket_count = 0;
     let mut frmt = String::new();
     let mut item = String::new();
