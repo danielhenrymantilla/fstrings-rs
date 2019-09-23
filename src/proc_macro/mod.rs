@@ -14,6 +14,7 @@ use ::syn::{*,
     punctuated::Punctuated,
 };
 use ::std::ops::Not;
+use regex::Regex;
 
 #[macro_use]
 mod macros;
@@ -96,95 +97,96 @@ fn format_args_f (input: TokenStream) -> TokenStream
 
     // this might be easier to maintain if we were to tokenize the
     // string and handle tokens rather than characters.
-    let mut iterator = s.char_indices().peekable();
+    let mut iterator = s.chars().peekable();
     
+    let mut curly_bracket_count = 0;
     let mut frmt = String::new();
+    let mut item = String::new();
+
+    let re_fmt = Regex::new(r":([xX]?\?|[oxXpbeE])?(\d+)?$").unwrap();
+    // identify any trailing formatting traits
+    // see: https://doc.rust-lang.org/std/fmt/#formatting-traits
+    // ? ⇒ Debug
+    // x? ⇒ Debug with lower-case hexadecimal integers
+    // X? ⇒ Debug with upper-case hexadecimal integers
+    // o ⇒ Octal
+    // x ⇒ LowerHex
+    // X ⇒ UpperHex
+    // p ⇒ Pointer
+    // b ⇒ Binary
+    // e ⇒ LowerExp
+    // E ⇒ UpperExp
+
     frmt.push('"');
-    while let Some((i, c)) = iterator.next() {
+    while let Some(c) = iterator.next() {
         if c != '{' {
             frmt.push(c);
             continue;
-        }
-        // encountered `{`, let's see if it was `{{`
-        if let Some(&(_, '{')) = iterator.peek() {
-            let _ = iterator.next();
-            frmt.push('{');
-            continue;
-        }
-        let s = &s[i + 1 ..];
-        let end =
-            s   .chars()
-                .position(|c| c == '}' || c == ':')
-                .expect(concat!(
-                    "Invalid format string literal\n",
-                    "note: if you intended to print `{`, ",
-                    "you can escape it using `{{`",
-                ))
-        ;
-        let mut arg = s[.. end].trim();
-
-        match arg.find(|c: char| (!c.is_alphanumeric()) && (c != '_'))
-        {
-            None =>
-            {
-                let ident = match parse_str::<Ident>(arg) {
-                    | Ok(ident) => ident,
-                    | Err(_) => continue,
-                };
-                // if `ident = ...` is not yet among the extra args
-                if  extra_args
-                    .iter()
-                    .all(|arg| Some(&ident) != arg.ident.as_ref())
-                {
-                    extra_args.push(FmtArg {
-                        expr: parse_quote!(#ident),
-                        ident: Some(ident),
-                    });
-                }
-                let end = s.find('}').expect(
-                    "missing close delimiter `}` in format." );
+        } else {
+            // encountered `{`, let's see if it was `{{`
+            if let Some(&'{') = iterator.peek() {
+                let _ = iterator.next();
                 frmt.push('{');
-                frmt.push_str(&s[..end]);
-                for _ in 0..end {
-                    iterator.next();
-                }
-            },
-            _ =>
-            {
-                let trailing_eq = arg.ends_with('=');
-                if trailing_eq {
-                    arg = &arg[.. arg.len() - 1];
-                }
-                let exp = match parse_str::<Expr>(arg) {
-                    | Ok(expr) => expr,
-                    | Err(_) => continue,
-                };
-                let id = format!("expr_{}___", expr_cnt);
-                expr_cnt += 1;
-                extra_args.push(FmtArg {
-                    expr: parse_quote!(#exp),
-                    ident: Some(parse_str::<Ident>(&id).unwrap())
-                });
-                if trailing_eq {
-                    frmt.push_str(&s[..end-1]);
-                    frmt.push('=');
-                }
-                frmt.push('{');
-                frmt.push_str(id.as_str());
-                if s[end..].starts_with(':') {
-                    frmt.push_str(&s[end..(s.find('}')
-                                     .expect("missing `}`."))]);
-                }
-                frmt.push('}');
-                let end = s.find('}')
-                    .expect(
-                        "missing close delimiter `}` in format." );
-                for _ in 0..end+1 {
-                    iterator.next();
+                continue;
+            }
+            curly_bracket_count += 1;
+            while let Some(c) = iterator.next() {
+                if c == '{' {
+                    curly_bracket_count += 1;
+                    item.push(c);
+                    continue;
+                } else if c == '}' {
+                    curly_bracket_count -= 1;
+                    if curly_bracket_count == 0 {
+                        let s = item.as_str();
+                        let (mut arg, fmt) =
+                            if let Some(fmt_match) = re_fmt.find(s)
+                        {
+                            (s[.. fmt_match.start()].trim(),
+                             Some(fmt_match.as_str()))
+                        } else {
+                            (s.trim(),
+                             None)
+                        };
+                        let trailing_eq = arg.ends_with('=');
+                        if trailing_eq {
+                            arg = &arg[.. arg.len() - 1];
+                        }
+                        let exp = match parse_str::<Expr>(arg) {
+                            | Ok(expr) => expr,
+                            | Err(_) => continue,
+                        };
+                        let id = format!("expr_{}_", expr_cnt);
+                        expr_cnt += 1;
+                        extra_args.push(FmtArg {
+                            expr: parse_quote!(#exp),
+                            ident: Some(parse_str::<Ident>(&id)
+                                        .unwrap())
+                        });
+                        if trailing_eq {
+                            frmt.push_str(arg);
+                            frmt.push('=');
+                        }
+                        frmt.push('{');
+                        frmt.push_str(id.as_str());
+                        if let Some(m) = fmt {
+                            frmt.push_str(m);
+                        }
+                        frmt.push('}');
+                        item.clear();
+                        break;
+                    } else {
+                        item.push(c);
+                        continue;
+                    }
+                } else {
+                    item.push(c);
+                    continue;
                 }
             }
         }
     }
+
     frmt.push('"');
     format_literal = parse_str::<LitStr>(frmt.as_str()).unwrap();
 
