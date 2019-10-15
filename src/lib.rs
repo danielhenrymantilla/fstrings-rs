@@ -92,6 +92,26 @@ mk_macros! { @with_dollar![$]=>
     writeln_f
         => writeln!(stream, ...)
     ,
+    #[doc = "Shorthand for [`error!(format_f!`]."]
+    error_f
+        => debug!(...)
+    ,
+    #[doc = "Shorthand for [`warn!(format_f!`]."]
+    warn_f
+        => debug!(...)
+    ,
+    #[doc = "Shorthand for [`info!(format_f!`]."]
+    info_f
+        => debug!(...)
+    ,
+    #[doc = "Shorthand for [`debug!(format_f!`]."]
+    debug_f
+        => debug!(...)
+    ,
+    #[doc = "Shorthand for [`trace!(format_f!`]."]
+    trace_f
+        => debug!(...)
+    ,
 }
 
 /// Like [`format_args!`](
