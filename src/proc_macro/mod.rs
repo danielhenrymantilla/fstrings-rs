@@ -95,7 +95,7 @@ fn format_args_f (input: TokenStream) -> TokenStream
         // encountered `{`, let's see if it was `{{`
         if let Some(&(_, '{')) = iterator.peek() {
             let _ = iterator.next();
-            out_format_literal.push_str("{{");
+            out_format_literal.push('{');
             continue;
         }
         let (end, colon_or_closing_brace) =

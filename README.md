@@ -9,7 +9,7 @@
 
 The interpolation works as follows:
 
- 1. if the (template) string literal contains a named parameters
+ 1. if the (template) string literal contains a named parameter
     (_e.g._ `{name}`)
 
  1. and no `name = value` argument is fed to the formatting call,
