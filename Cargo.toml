@@ -1,6 +1,6 @@
 [package]
 name = "fstrings"
-version = "0.1.4"
+version = "0.2.0"
 authors = ["Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>"]
 edition = "2018"
 
@@ -16,15 +16,16 @@ keywords = ["python", "format", "human", "no_std", "interpolation"]
 categories = ["rust-patterns", ]
 
 [dependencies]
-proc-macro-hack = "0.5.8"
+proc-macro-hack = "0.5.11"
 
 [dependencies.proc-macro]
-version = "0.1.4"
+version = "0.2.0"
 package = "fstrings-proc-macro"
 path = "src/proc_macro"
 
 [features]
 default = []
+
 nightly = []
 verbose-expansions = ["proc-macro/verbose-expansions", ]
 

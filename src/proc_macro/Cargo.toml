@@ -4,18 +4,22 @@ path = "mod.rs"
 
 [package]
 name = "fstrings-proc-macro"
-version = "0.1.4"
+version = "0.2.0"
 authors = ["Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>"]
 edition = "2018"
 
 description = "Python3 fstring interpolation in Rust"
 license = "MIT"
 
+documentation = "https://docs.rs/fstrings"
+repository = "https://github.com/danielhenrymantilla/fstrings-rs"
+homepage = "https://crates.io/crates/fstrings"
+
 [dependencies]
-proc-macro2 = "0.4.30"
-proc-macro-hack = "0.5.8"
-proc-quote = "0.2.2"
-syn = { version = "0.15.42", features = ["full", ]}
+proc-macro2 = "1.0.*"
+proc-macro-hack = "0.5.11"
+quote = "1.0.*"
+syn = { version = "1.0.*", features = ["full"]}
 
 [features]
 verbose-expansions = ["syn/extra-traits", ]

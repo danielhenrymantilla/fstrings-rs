@@ -35,18 +35,32 @@ fn main ()
         String::from("Hello, World!"),
     );
 
-    // advanced_cases
+    // ## Advanced cases:
     {
-        // it remains compatible with classic formatting parameters
+        // It remains compatible with classic formatting parameters
         assert_eq!(
             f!("{hi}, {name}!", hi = "Hello"),
             "Hello, World!",
         );
 
-        // you can override / shadow the named arguments
+        // You can override / shadow the named arguments
         assert_eq!(
             f!("Hello, {name}!", name = "Earth"),
             "Hello, Earth!",
+        );
+
+        // You can use field access (but no method calls!)
+        let foo = Foo { name }; /* where */ struct Foo<T> { name: T }
+        assert_eq!(
+            f!("Hello, {foo.name}!"),
+            "Hello, World!",
+        );
+
+        // This also works with tuple indexing.
+        let ft_and_name = (42, name);
+        assert_eq!(
+            f!("Hello, {ft_and_name.1}!"),
+            "Hello, World!",
         );
     }
 }
