@@ -62,6 +62,14 @@ fn main ()
             f!("Hello, {ft_and_name.1}!"),
             "Hello, World!",
         );
+
+        // You can use fstrings to debug by appending a `=` after the
+        // interpolated expression.
+        let x = 0b_101010;
+        assert_eq!(
+            f!("In this context {x=}"),
+            "In this context x = 42",
+        );
     }
 }
 ```

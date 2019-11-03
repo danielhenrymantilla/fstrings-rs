@@ -113,7 +113,16 @@ fn format_args_f (input: TokenStream) -> TokenStream
             |it| it.push(colon_or_closing_brace),
         );
         let out_format_literal: &mut String = &mut *out_format_literal;
-        let arg = s[i + 1 .. end].trim();
+        let mut arg = s[i + 1 .. end].trim();
+        if let Some("=") = arg.get(arg.len().saturating_sub(1) ..) {
+            assert_eq!(
+                out_format_literal.pop(),  // Remove the opening brace
+                Some('{'),
+            );
+            arg = &arg[.. arg.len() - 1];
+            out_format_literal.push_str(arg);
+            out_format_literal.push_str(" = {");
+        }
         if arg.is_empty() {
             continue;
         }
