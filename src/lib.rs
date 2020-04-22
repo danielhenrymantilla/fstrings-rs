@@ -13,6 +13,8 @@
 
 #![no_std]
 
+extern crate proc_macro;
+
 mod doctest_readme {
     macro_rules! with_doc {(
         #[doc = $doc_string:expr]
