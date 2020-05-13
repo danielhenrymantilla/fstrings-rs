@@ -94,15 +94,15 @@ mk_macros! { @with_dollar![$]=>
     ,
     #[doc = "Shorthand for [`error!(format_f!`]."]
     error_f
-    =>debug!(...)
+    =>error!(...)
     ,
     #[doc = "Shorthand for [`warn!(format_f!`]."]
     warn_f
-        => debug!(...)
+        => warn!(...)
     ,
     #[doc = "Shorthand for [`info!(format_f!`]."]
     info_f
-        => debug!(...)
+        => info!(...)
     ,
     #[doc = "Shorthand for [`debug!(format_f!`]."]
     debug_f
@@ -110,7 +110,7 @@ mk_macros! { @with_dollar![$]=>
     ,
     #[doc = "Shorthand for [`trace!(format_f!`]."]
     trace_f
-        => debug!(...)
+        => trace!(...)
      ,
 }
 
