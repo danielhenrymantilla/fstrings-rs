@@ -19,7 +19,7 @@ categories = ["rust-patterns", ]
 members = ["proc_macro"]
 
 [dependencies]
-proc-macro-hack = "0.5.11"
+proc-macro-hack = "0.5.19"
 
 [dependencies.proc-macro]
 version = "0.2.3"
