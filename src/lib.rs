@@ -1,16 +1,10 @@
-#![cfg_attr(feature = "nightly",
-    feature(external_doc)
-)]
-#![cfg_attr(feature = "nightly",
-    doc(include = "../README.md")
-)]
-#![cfg_attr(not(feature = "nightly"),
+#![cfg_attr(feature = "nightly", feature(external_doc))]
+#![cfg_attr(feature = "nightly", doc(include = "../README.md"))]
+#![cfg_attr(
+    not(feature = "nightly"),
     doc = "See [crates.io](https://crates.io/crates/fstrings)"
 )]
-#![cfg_attr(not(feature = "nightly"),
-    doc = "for more info about this crate."
-)]
-
+#![cfg_attr(not(feature = "nightly"), doc = "for more info about this crate.")]
 #![no_std]
 
 extern crate proc_macro;
