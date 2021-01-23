@@ -7,7 +7,7 @@ edition = "2018"
 license = "MIT"
 
 documentation = "https://docs.rs/fstrings"
-repository = "https://github.com/danielhenrymantilla/fstrings-rs"
+repository = "https://github.com/danielhenrymantilla/fstrings-rs.git"
 homepage = "https://crates.io/crates/fstrings"
 
 readme = "README.md"
