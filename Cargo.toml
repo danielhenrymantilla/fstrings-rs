@@ -15,13 +15,16 @@ description = "Python3 fstring interpolation in Rust"
 keywords = ["python", "format", "human", "no_std", "interpolation"]
 categories = ["rust-patterns", ]
 
+[workspace]
+members = ["proc_macro"]
+
 [dependencies]
 proc-macro-hack = "0.5.11"
 
 [dependencies.proc-macro]
 version = "0.2.3"
 package = "fstrings-proc-macro"
-path = "src/proc_macro"
+path = "proc_macro"
 
 [features]
 default = []
