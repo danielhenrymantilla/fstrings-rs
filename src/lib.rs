@@ -1,19 +1,16 @@
 #![cfg_attr(feature = "nightly",
-    feature(external_doc)
-)]
-#![cfg_attr(feature = "nightly",
-    doc(include = "../README.md")
+    cfg_attr(all(), doc = include_str!("../README.md")),
 )]
 #![cfg_attr(not(feature = "nightly"),
-    doc = "See [crates.io](https://crates.io/crates/fstrings)"
+    doc = "See [crates.io](https://crates.io/crates/fstrings)",
 )]
 #![cfg_attr(not(feature = "nightly"),
-    doc = "for more info about this crate."
+    doc = "for more info about this crate.",
 )]
 
 #![no_std]
 
-extern crate proc_macro;
+extern crate fstrings_proc_macro;
 
 mod doctest_readme {
     macro_rules! with_doc {(
@@ -120,4 +117,4 @@ mk_macros! { @with_dollar![$]=>
 /// https://doc.rust-lang.org/std/macro.format_args.html),
 /// but with basic f-string interpolation.
 #[::proc_macro_hack::proc_macro_hack(fake_call_site)]
-pub use proc_macro::format_args_f;
+pub use fstrings_proc_macro::format_args_f;
