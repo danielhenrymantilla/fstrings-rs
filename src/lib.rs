@@ -44,7 +44,7 @@ macro_rules! mk_macros {( @with_dollar![$dol:tt]=>
         macro_rules! $printlnf {(
             $($dol $stream : expr,)? $dol($dol args:tt)*
         ) => (
-            $println!($($dol $stream,)? "{}", format_args_f!($dol($dol args)*))
+            $println!($($dol $stream,)? "{}", $crate::format_args_f!($dol($dol args)*))
         )}
     )*
 )}
