@@ -1,6 +1,6 @@
 [package]
 name = "fstrings"
-version = "0.2.4-rc2"
+version = "1.0.0"
 authors = ["Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>"]
 edition = "2018"
 
@@ -19,7 +19,7 @@ categories = ["rust-patterns", ]
 proc-macro-hack = "0.5.11"
 
 [dependencies.proc-macro]
-version = "0.2.4-rc2"
+version = "1.0.0"
 package = "fstrings-proc-macro"
 path = "src/proc_macro"
 
@@ -31,4 +31,3 @@ verbose-expansions = ["proc-macro/verbose-expansions", ]
 
 [package.metadata.docs.rs]
 features = ["nightly", ]
-
