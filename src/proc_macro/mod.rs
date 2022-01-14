@@ -176,7 +176,7 @@ fn format_args_f (input: TokenStream) -> TokenStream
                             ));
                         }
                     },
-                    | Segment::Self_(ident) => {
+                    | Segment::Self_(_ident) => {
                         continue;
                     },
                 }

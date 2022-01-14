@@ -3,6 +3,8 @@
 [![Repository](https://img.shields.io/badge/repository-GitHub-brightgreen.svg)](https://github.com/danielhenrymantilla/fstrings-rs)
 [![Latest version](https://img.shields.io/crates/v/fstrings.svg)](https://crates.io/crates/fstrings)
 [![Documentation](https://docs.rs/fstrings/badge.svg)](https://docs.rs/fstrings)
+[![MSRV](https://img.shields.io/badge/MSRV-1.36.0-white)](
+https://gist.github.com/danielhenrymantilla/8e5b721b3929084562f8f65668920c33)
 [![License](https://img.shields.io/crates/l/fstrings.svg)](https://github.com/danielhenrymantilla/fstrings-rs/blob/master/LICENSE)
 
   - Note, this crate has been rendered obsolete as of 1.58.0, wherein

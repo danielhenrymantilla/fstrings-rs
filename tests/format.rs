@@ -1,4 +1,4 @@
-use fstrings::{format_args_f, format_f};
+use ::fstrings::format_f;
 
 #[test]
 fn format_f_single_line() {
