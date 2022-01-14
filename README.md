@@ -5,6 +5,14 @@
 [![Documentation](https://docs.rs/fstrings/badge.svg)](https://docs.rs/fstrings)
 [![License](https://img.shields.io/crates/l/fstrings.svg)](https://github.com/danielhenrymantilla/fstrings-rs/blob/master/LICENSE)
 
+  - Note, this crate has been rendered obsolete as of 1.58.0, wherein
+    `let x = 42; println!("{x}");` acts as `let x = 42; println_f!("{x}");`
+    here.
+
+    A precursor/pioneer crate, for sure, and one which now has been subsumed
+    by [RFC 2795](https://github.com/rust-lang/rfcs/pull/2795), which
+    successfully championed the ideas behind this crate! 🏆
+
 ## Basic fstring interpolation in Rust
 
 The interpolation works as follows:
